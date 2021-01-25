@@ -7,14 +7,10 @@ import cookieParser from "cookie-parser";
 import Logger from "node-logger-es6";
 import { configurationFile } from "./lib/config";
 import { ApplicationError } from "./lib/errors";
-import { verify as verifyMiddleware } from "./routes/sessions";
 import {
-  create as createUserRoutes,
   signUp as userSignUpRoutes,
   signIn as userSignInRoutes,
-  verifyOtp as verifyOtpRoutes,
-  get as getUserRoutes,
-  update as updateUserRoutes
+  verifyOtp as verifyOtpRoutes
 } from "./routes/user";
 
 const logger = Logger.configure(configurationFile.loggerConfig);
@@ -60,11 +56,9 @@ export default function createRouter() {
    * users endpoints
    */
   // the sessions.verify middleware ensures the user is logged in
-  router.post("/user", createUserRoutes);
-  router.put("/user/:id", verifyMiddleware, updateUserRoutes);
-  router.post("/login", getUserRoutes);
+
   router.post("/signup", userSignUpRoutes);
-  router.post("/signin", userSignInRoutes);
+  router.get("/signin", userSignInRoutes);
   router.post("/verifyotp", verifyOtpRoutes);
 
   // ******************

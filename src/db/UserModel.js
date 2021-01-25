@@ -6,6 +6,7 @@ import { generateToken } from "../lib/token";
 import * as constants from "../lib/constants";
 import { sendSms, getVerificationCode, sendEmail } from "../lib/utils";
 import shortUniqueId from "short-unique-id";
+import * as plaid from "plaid";
 import _ from "lodash";
 const uid = new shortUniqueId();
 
@@ -17,38 +18,16 @@ export default class UserModel extends BaseModel {
     this.model = this.connection.model(this.name, this.schema);
   }
 
-  async create(userInformation) {
-    try {
-      const user = await this.model.create(userInformation);
-      if (!user) {
-        return null;
-      }
-      const PUBLIC_FIELDS = [
-        "_id",
-        "avatar",
-        "firstName",
-        "lastName",
-        "botChannelId"
-      ];
-      return filterFields(user, PUBLIC_FIELDS);
-    } catch (error) {
-      throw new ApplicationError(error, 500, {});
-    }
-  }
-
   async signUp(newUser) {
     try {
-      const userInfo = await this.getUserByPhoneNumber(newUser.phoneNumber);
+      const userInfo = await this.getUserByEmail(newUser.email);
       if (userInfo) {
         throw new ApplicationError("User already exists!!", 403);
       }
       const verificationCode = getVerificationCode();
-      newUser._id = newUser.firebaseId;
       newUser.verificationCode = verificationCode;
-      newUser.referralToken = uid.randomUUID(8);
       const user = await this.model.create(newUser);
       if (user) {
-        sendSms(newUser.phoneNumber, verificationCode);
         sendEmail(newUser.email, verificationCode);
         return { message: "OTP has been sent successfully!!" };
       } else {
@@ -58,32 +37,66 @@ export default class UserModel extends BaseModel {
       throw error;
     }
   }
-
+  async getUserByEmail(email) {
+    try {
+      const user = await this.model.findOne({
+        email: email
+      });
+      return user || null;
+    } catch (error) {
+      throw new ApplicationError(error, 500, {});
+    }
+  }
   async signIn(phoneNumber) {
     try {
-      const verificationCode = getVerificationCode();
-      const user = await this.model.findOneAndUpdate(
-        { phoneNumber: phoneNumber },
-        { $set: { verificationCode: verificationCode } },
-        { new: true }
+      const client = new plaid.Client({
+        clientID: "600bc50bc2973c000f7d51ce",
+        secret: "f96cf7b6044909892ff311777a956b",
+        env: plaid.environments.sandbox,
+        options: {
+          version: "2018-05-22" // '2020-09-14' | '2019-05-29' | '2018-05-22' | '2017-03-08'
+        }
+      });
+      const resp = await client.createLinkToken({
+        user: { client_user_id: "123-test-user-id" },
+        client_name: "Plaid Test App",
+        products: ["auth", "transactions"],
+        country_codes: ["GB"],
+        language: "en",
+        webhook: "https://sample-web-hook.com",
+        account_filters: {
+          depository: { account_subtypes: ["checking", "savings"] }
+        }
+      });
+
+      const response = await client.getLinkToken(resp.link_token);
+      console.log(response.link_token); //Need to pass into frontned
+      const getAccessToken = await client.exchangePublicToken(
+        "public-sandbox-3a1467da-aa7a-46b8-b0c2-ce9f0e83d935"
       );
-      if (!user) {
-        throw new ApplicationError("No record found!!", 403);
-      }
-      sendSms(phoneNumber, verificationCode);
-      sendEmail(user.email, verificationCode);
-      return { message: "OTP has been sent successfully!!" };
+      const accountInfomration = await client
+        .getAccounts(getAccessToken.access_token)
+        .catch(err => {
+          console.log(err);
+        });
+
+      //Pass this access token to GetPublic Token
+      // const publicToken = await client.createPublicToken(
+      //   publicExcgangeToken.access_token
+      // );
+      return accountInfomration;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
 
-  async verifyOtp(phoneNumber, verificationCode) {
+  async verifyOtp(email, verificationCode) {
     try {
       const user = await this.model
         .findOneAndUpdate(
           {
-            phoneNumber: phoneNumber,
+            email: phoneNumber,
             verificationCode: verificationCode
           },
           { $set: { verificationCode: null, status: constants.VERIFIED } },
@@ -93,72 +106,7 @@ export default class UserModel extends BaseModel {
       if (!user) {
         throw new ApplicationError("Invalid details!!", 403);
       }
-      const portfolioModel = new PortfolioModel();
-      const portfolio = await portfolioModel.getUserPortfolio(user._id);
-      user.portfolio = portfolio;
-      user.token = await generateToken(user.firebaseId);
-      return user;
-    } catch (error) {
-      throw error;
-    }
-  }
 
-  //This function will be removed once new signup and login flow will be in use
-  async get(userInformation) {
-    try {
-      let { phoneNumber } = userInformation;
-      const user = await this.model
-        .find({
-          phoneNumber: phoneNumber
-        })
-        .lean();
-      if (!user[0]) {
-        return null;
-      } else {
-        return user[0];
-      }
-    } catch (error) {
-      throw new ApplicationError(error, 500, {});
-    }
-  }
-
-  async getAllUsers() {
-    try {
-      const users = await this.model.find();
-      return users;
-    } catch (error) {
-      throw new ApplicationError(error, 500, {});
-    }
-  }
-
-  async getUsers(userIds) {
-    try {
-      let userInfo = await this.model.find({
-        firebaseId: { $in: userIds }
-      });
-      return userInfo;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async update(id, userInformation) {
-    try {
-      const fieldsToUpdate = _.pick(userInformation, [
-        "firstName",
-        "lastName",
-        "email",
-        "gender",
-        "avatar"
-      ]);
-      const user = await this.model.findOneAndUpdate(
-        { firebaseId: id },
-        { $set: fieldsToUpdate },
-        { new: true }
-      );
-      if (!user) {
-        return null;
-      }
       return user;
     } catch (error) {
       throw error;

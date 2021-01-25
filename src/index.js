@@ -7,6 +7,7 @@ import https from "https";
 import http from "http";
 import fs from "fs";
 import cors from "cors";
+import client from "plaid";
 import { getEnv } from "./lib/env";
 import createRouter from "./router";
 const app = express();
@@ -14,6 +15,25 @@ app.use(cors({ origin: "*" }));
 app.use(compression());
 app.use(createRouter());
 console.log(getEnv("NODE_ENV"));
+// const response = await client
+// .createLinkToken({
+//   user: {
+//     client_user_id: "123-test-user-id"
+//   },
+//   client_name: "Plaid Test App",
+//   products: ["auth", "transactions"],
+//   country_codes: ["GB"],
+//   language: "en",
+//   webhook: "https://sample-web-hook.com",
+//   account_filters: {
+//     depository: {
+//       account_subtypes: ["checking", "savings"]
+//     }
+//   }
+// })
+// .catch(err => {
+//   // handle error
+// });
 const port = 8000;
 const sslOptions = {
   key: fs.readFileSync("./ssl/nginx.key"),

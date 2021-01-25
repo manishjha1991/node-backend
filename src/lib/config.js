@@ -1,11 +1,14 @@
 export const configurationFile = {
   development: {
-    mongoUrl:
-      "mongodb://manish:manishjha.123@cluster0-shard-00-00-gvk1v.mongodb.net:27017,cluster0-shard-00-01-gvk1v.mongodb.net:27017,cluster0-shard-00-02-gvk1v.mongodb.net:27017/basisXelpmocDev?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin",
+    mongoUrl: "mongodb://localhost:27017/backend-test",
 
-    kiteConnect: {
-      apiKey: "b3gwlue1woo8oomf",
-      apiSecret: "cuglqt640t577lyv3m64pnj9igtat3q6"
+    plaidConnect: {
+      PLAID_CLIENT_ID: "600bc50bc2973c000f7d51ce ",
+      PLAID_SECRET: "f96cf7b6044909892ff311777a956b"
+    },
+    dwollaConnect: {
+      KEY: "ZCulYxmi1gLMt0HAgAcdtDJ93XWpY1lyDst4Uyf7byODzBqIJN",
+      SECRET: "siXTIRpekGZcdN5MFwudMmtqP9iTPimOzxGUao9RnkhvKeGrjt"
     }
   },
 
