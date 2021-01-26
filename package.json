@@ -6,12 +6,6 @@
   "license": "MIT",
   "scripts": {
     "dev-server": "rm -rf logs && mkdir logs && nodemon --exec \" cross-env nodemon --exec NODE_ENV=development babel-node --inspect src\"",
-    "build": "babel -d ./build src && rm -rf logs && mkdir logs",
-    "start-staging": "yarn run build  && pm2 startOrRestart ecosystem.config.js --env staging ",
-    "start": "yarn run build  && pm2 startOrRestart ecosystem.config.js --env production ",
-    "test": "rm -rf logs && mkdir logs && NODE_ENV=test jest --forceExit --runInBand",
-    "deploy": "pm2 deploy ecosystem.config.js staging --force",
-    "deploy-production": "pm2 deploy ecosystem.config.js production --force",
     "lint": "eslint 'src/**/*.js'",
     "precommit": "lint-staged",
     "fix-lint": "prettier --write './src/**/*.js' && npm run-script lint"
