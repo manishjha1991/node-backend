@@ -115,20 +115,21 @@ export default class UserModel extends BaseModel {
         .catch(err => {
           console.log(err);
         });
-      const processorTokenResponse = await this.client.createProcessorToken(
-        getAccessToken.access_token,
-        metadata.accounts[0].id,
-        "dwolla"
-      );
+      // const processorTokenResponse = await this.client.createProcessorToken(
+      //   getAccessToken.access_token,
+      //   metadata.accounts[0].id,
+      //   "dwolla"
+      // );
 
-      const payload = {
-        client_id: "600bc50bc2973c000f7d51ce",
-        secret: "f96cf7b6044909892ff311777a956b",
-        processor_token: processorTokenResponse
-      };
-      const authInfomration = await getAuthInfomration(payload);
-
-      console.log(authInfomration, "yesss");
+      // const payload = {
+      //   client_id: "600bc50bc2973c000f7d51ce",
+      //   secret: "f96cf7b6044909892ff311777a956b",
+      //   processor_token: processorTokenResponse
+      // };
+      // const authInfomration = await getAuthInfomration(
+      //   payload,
+      //   "https://api-sandbox.dwolla.com/customers"
+      // );
       return accountInfomration;
     } catch (error) {
       console.log(error);
