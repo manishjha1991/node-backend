@@ -36,19 +36,6 @@ export default class UserModel extends BaseModel {
       secret: process.env.D_SECRET,
       environment: process.env.D_ENV
     });
-    // this.client = new plaid.Client({
-    //   clientID: "600bc50bc2973c000f7d51ce",
-    //   secret: "f96cf7b6044909892ff311777a956b",
-    //   env: plaid.environments.sandbox,
-    //   options: {
-    //     version: "2018-05-22" // '2020-09-14' | '2019-05-29' | '2018-05-22' | '2017-03-08'
-    //   }
-    // });
-    // this.appToken = new Client({
-    //   key: "ZCulYxmi1gLMt0HAgAcdtDJ93XWpY1lyDst4Uyf7byODzBqIJN",
-    //   secret: "siXTIRpekGZcdN5MFwudMmtqP9iTPimOzxGUao9RnkhvKeGrjt",
-    //   environment: "sandbox" // defaults to 'production'
-    // });
   }
 
   async signUp(newUser) {
