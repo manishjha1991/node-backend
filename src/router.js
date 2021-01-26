@@ -10,7 +10,10 @@ import { ApplicationError } from "./lib/errors";
 import {
   signUp as userSignUpRoutes,
   signIn as userSignInRoutes,
-  verifyOtp as verifyOtpRoutes
+  verifyOtp as verifyOtpRoutes,
+  retryOTP as retryOTPRoutes,
+  getLinkToken as generatedLinkTokenRoutes,
+  getAccountInformation as getAccountInformationRoutes
 } from "./routes/user";
 
 const logger = Logger.configure(configurationFile.loggerConfig);
@@ -59,7 +62,10 @@ export default function createRouter() {
 
   router.post("/signup", userSignUpRoutes);
   router.get("/signin", userSignInRoutes);
+  router.post("/retry-otp", retryOTPRoutes);
   router.post("/verifyotp", verifyOtpRoutes);
+  router.post("/link", generatedLinkTokenRoutes);
+  router.post("/account-info", getAccountInformationRoutes);
 
   // ******************
   // * ERROR HANDLING *

@@ -29,7 +29,7 @@ export const sendEmail = async (email, verificationCode) => {
   var mailOptions = {
     from: constants.EMAIL.userName,
     to: email,
-    subject: "Verification Code from Basis",
+    subject: "Verification Code from backedn-test",
     text: `${verificationCode}  ${constants.OTP_MESSAGE}`
   };
   return await transporter.sendMail(mailOptions, (error, info) => {

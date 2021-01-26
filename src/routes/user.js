@@ -31,20 +31,52 @@ export const signIn = route(async (req, res) => {
   }
 });
 
-export const verifyOtp = route(
-  async (req, res) => {
-    const userModel = new UserModel();
-    try {
-      const user = await userModel.verifyOtp(
-        req.body.phoneNumber,
-        req.body.verificationCode
-      );
-      res.send({ results: user });
-    } catch (error) {
-      throw error;
-    }
-  },
-  {
-    requiredFields: ["phoneNumber", "verificationCode"]
+export const verifyOtp = route(async (req, res) => {
+  const userModel = new UserModel();
+  try {
+    const user = await userModel.verifyOtp(
+      req.body.email,
+      req.body.verificationCode
+    );
+    res.send({ results: user });
+  } catch (error) {
+    throw error;
   }
-);
+});
+// Get Link Api routes
+export const getLinkToken = route(async (req, res) => {
+  const userModel = new UserModel();
+  try {
+    console.log(req.body);
+    const link = await userModel.getLinkToken(req.body.email);
+    res.send({ results: link });
+  } catch (error) {
+    throw error;
+  }
+});
+
+// Get getAccessToken token
+export const getAccountInformation = route(async (req, res) => {
+  console.log(JSON.stringify(req.body.metadata));
+  const userModel = new UserModel();
+  try {
+    const link = await userModel.accountInfomration(
+      req.body.token,
+      req.body.metadata
+    );
+    res.send({ results: link });
+  } catch (error) {
+    throw error;
+  }
+});
+
+//retry otp
+export const retryOTP = route(async (req, res) => {
+  const userModel = new UserModel();
+  try {
+    const link = await userModel.reinitiateOtp(req.body.email);
+    res.send({ results: link });
+  } catch (error) {
+    throw error;
+  }
+});

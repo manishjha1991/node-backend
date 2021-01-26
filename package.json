@@ -1,8 +1,8 @@
 {
-  "name": "basis-api",
+  "name": "backedn-test-api",
   "version": "1.0.0",
-  "description": "basis backend",
-  "author": "XelpmocDesignandTechPvtLtd",
+  "description": "backedn-test backend",
+  "author": "backedn-testDesignandTechPvtLtd",
   "license": "MIT",
   "scripts": {
     "dev-server": "rm -rf logs && mkdir logs && nodemon --exec \" cross-env nodemon --exec NODE_ENV=development babel-node --inspect src\"",
@@ -37,16 +37,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/XelpmocDesignandTechPvtLtd/basis-api.git"
+    "url": "git+https://github.com/backedn-testDesignandTechPvtLtd/backedn-test-api.git"
   },
   "keywords": [
     "backend",
     "boilerplate"
   ],
   "bugs": {
-    "url": "https://github.com/XelpmocDesignandTechPvtLtd/basis-api/issues"
+    "url": "https://github.com/backedn-testDesignandTechPvtLtd/backedn-test-api/issues"
   },
-  "homepage": "https://github.com/XelpmocDesignandTechPvtLtd/basis-api/blob/master/README.md",
+  "homepage": "https://github.com/backedn-testDesignandTechPvtLtd/backedn-test-api/blob/master/README.md",
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-builtin-extend": "^1.1.2",
@@ -63,6 +63,8 @@
     "express": "^4.16.1",
     "express-force-ssl": "^0.3.2",
     "husky": "^0.14.3",
+    "install": "^0.13.0",
+    "ip": "^1.1.5",
     "jsonwebtoken": "^8.0.1",
     "lint-staged": "^4.0.2",
     "lodash": "^4.17.4",
@@ -72,6 +74,7 @@
     "node-logger-es6": "^1.2.2",
     "node-schedule": "^1.3.0",
     "nodemailer": "^4.6.4",
+    "npm": "^6.14.11",
     "plaid": "^8.1.3",
     "requestify": "^0.2.5",
     "short-unique-id": "^3.2.3",

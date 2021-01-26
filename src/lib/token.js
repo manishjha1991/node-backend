@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { getEnv } from "./env";
 
-const JWT_SECRET = "jwt_secret_basis_key";
+const JWT_SECRET = "jwt_secret_backedn-test_key";
 
 // TODO: feel free to add more arguments to this function and generate a
 // JSON web token with more members than just the id.

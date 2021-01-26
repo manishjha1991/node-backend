@@ -15,25 +15,6 @@ app.use(cors({ origin: "*" }));
 app.use(compression());
 app.use(createRouter());
 console.log(getEnv("NODE_ENV"));
-// const response = await client
-// .createLinkToken({
-//   user: {
-//     client_user_id: "123-test-user-id"
-//   },
-//   client_name: "Plaid Test App",
-//   products: ["auth", "transactions"],
-//   country_codes: ["GB"],
-//   language: "en",
-//   webhook: "https://sample-web-hook.com",
-//   account_filters: {
-//     depository: {
-//       account_subtypes: ["checking", "savings"]
-//     }
-//   }
-// })
-// .catch(err => {
-//   // handle error
-// });
 const port = 8000;
 const sslOptions = {
   key: fs.readFileSync("./ssl/nginx.key"),
@@ -41,7 +22,7 @@ const sslOptions = {
 };
 http
   .createServer(app)
-  .listen(3000, () => console.log(`http is running on 3000`));
+  .listen(9000, () => console.log(`http is running on 9000`));
 https
   .createServer(sslOptions, app)
   .listen(port, () => console.log(`https is Listening on port ${port}`));

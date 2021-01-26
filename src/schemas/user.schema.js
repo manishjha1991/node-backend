@@ -13,6 +13,25 @@ const User = new mongoose.Schema(
       message: "{VALUE} is not a valid email",
       required: true
     },
+    firstName: {
+      type: String,
+      required: true
+    },
+    lastName: {
+      type: String,
+      required: true
+    },
+    type: {
+      type: String
+    },
+    address: {
+      type: String,
+      required: true
+    },
+    ipAddress: {
+      type: String,
+      required: true
+    },
     verificationCode: {
       type: Number,
       default: null
