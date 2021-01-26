@@ -11,7 +11,7 @@ export const generateLinkToken = async client => {
       user: { client_user_id: "123-test-user-id" },
       client_name: "Plaid Test App",
       products: ["auth", "transactions"],
-      country_codes: ["GB"],
+      country_codes: ["US"],
       language: "en",
       webhook: "https://sample-web-hook.com",
       account_filters: {
@@ -33,9 +33,9 @@ export const generatePublicExchangeToken = async (publicToken, client) => {
     throw error;
   }
 };
-export const getAuthInfomration = async payload => {
+export const getAuthInfomration = async (accessToken, client) => {
   try {
-    return api.post(payload);
+    return await client.getAuth(accessToken, {});
   } catch (eror) {
     logger.error(`getAuthInfomration issue : ${error}`);
     throw error;

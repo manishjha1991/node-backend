@@ -15,6 +15,7 @@ app.use(cors({ origin: "*" }));
 app.use(compression());
 app.use(createRouter());
 console.log(getEnv("NODE_ENV"));
+require("dotenv").config();
 const port = 8000;
 const sslOptions = {
   key: fs.readFileSync("./ssl/nginx.key"),

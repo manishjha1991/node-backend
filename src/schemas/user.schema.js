@@ -32,6 +32,26 @@ const User = new mongoose.Schema(
       type: String,
       required: true
     },
+    customerLink: {
+      type: String,
+      default: null
+    },
+    fundLink: {
+      type: String,
+      default: null
+    },
+    routingNumber: {
+      type: String,
+      default: null
+    },
+    dwollaAccountId: {
+      type: String,
+      default: null
+    },
+    accountNumber: {
+      type: String,
+      default: null
+    },
     verificationCode: {
       type: Number,
       default: null

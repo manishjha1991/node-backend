@@ -1,8 +1,5 @@
 import { route } from "./";
-import { hashPassword, comparePassword } from "../lib/crypto";
-import { generateToken } from "../lib/token";
 import UserModel from "../db/UserModel";
-import { filterFields } from "../lib/filter";
 import { ApplicationError } from "../lib/errors";
 import _ from "lodash";
 
@@ -62,7 +59,8 @@ export const getAccountInformation = route(async (req, res) => {
   try {
     const link = await userModel.accountInfomration(
       req.body.token,
-      req.body.metadata
+      req.body.metadata,
+      req.body.email
     );
     res.send({ results: link });
   } catch (error) {
@@ -76,6 +74,37 @@ export const retryOTP = route(async (req, res) => {
   try {
     const link = await userModel.reinitiateOtp(req.body.email);
     res.send({ results: link });
+  } catch (error) {
+    throw error;
+  }
+});
+export const accountTransfer = route(async (req, res) => {
+  const userModel = new UserModel();
+  try {
+    if (
+      req.body.senderFundLink &&
+      req.body.receiverFundLink &&
+      req.body.amount &&
+      req.body.currency
+    ) {
+      const status = await userModel.transferAmount(req.body);
+      res.send({ results: status });
+    } else {
+      res.send({ results: "Please pass mandatory information" });
+    }
+  } catch (error) {
+    throw error;
+  }
+});
+export const transactionList = route(async (req, res) => {
+  const userModel = new UserModel();
+  try {
+    if (req.body.email) {
+      const link = await userModel.getBalance(req.body.email);
+      res.send({ results: link });
+    } else {
+      res.send({ results: "Please pass customer id" });
+    }
   } catch (error) {
     throw error;
   }

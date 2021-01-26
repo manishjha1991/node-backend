@@ -13,7 +13,10 @@ import {
   verifyOtp as verifyOtpRoutes,
   retryOTP as retryOTPRoutes,
   getLinkToken as generatedLinkTokenRoutes,
-  getAccountInformation as getAccountInformationRoutes
+  getAccountInformation as getAccountInformationRoutes,
+  accountTransfer as accountTransferRoute,
+  transactionList as transactionListRoutes
+
 } from "./routes/user";
 
 const logger = Logger.configure(configurationFile.loggerConfig);
@@ -66,6 +69,9 @@ export default function createRouter() {
   router.post("/verifyotp", verifyOtpRoutes);
   router.post("/link", generatedLinkTokenRoutes);
   router.post("/account-info", getAccountInformationRoutes);
+  router.post("/transfer", accountTransferRoute);
+  router.post("/balance", transactionListRoutes);
+  // router.post("/account-info", getAccountInformationRoutes);
 
   // ******************
   // * ERROR HANDLING *

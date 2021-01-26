@@ -3,16 +3,18 @@ import ip from "ip";
 import { ApplicationError } from "../lib/errors";
 import {
   generateLinkToken,
-  generatePublicExchangeToken,
-  getAuthInfomration
+  generatePublicExchangeToken
 } from "../lib/connectUtils";
+import { createCustomer, addFundAccount } from "../lib/dwollaUtils";
 import { default as userSchema } from "../schemas/user.schema.js";
 import * as constants from "../lib/constants";
-import { sendSms, getVerificationCode, sendEmail } from "../lib/utils";
+import { getVerificationCode, sendEmail } from "../lib/utils";
 import shortUniqueId from "short-unique-id";
 import * as plaid from "plaid";
 import _ from "lodash";
 const uid = new shortUniqueId();
+
+var Client = require("dwolla-v2").Client;
 
 export default class UserModel extends BaseModel {
   constructor(connection) {
@@ -21,13 +23,32 @@ export default class UserModel extends BaseModel {
     this.name = "user";
     this.model = this.connection.model(this.name, this.schema);
     this.client = new plaid.Client({
-      clientID: "600bc50bc2973c000f7d51ce",
-      secret: "f96cf7b6044909892ff311777a956b",
-      env: plaid.environments.sandbox,
+      clientID: process.env.P_CLIENTID,
+      secret: process.env.P_SECRETID,
+      env: process.env.P_ENV,
       options: {
-        version: "2018-05-22" // '2020-09-14' | '2019-05-29' | '2018-05-22' | '2017-03-08'
+        version: process.env.P_VERSION
       }
     });
+
+    this.appToken = new Client({
+      key: process.env.D_KEY,
+      secret: process.env.D_SECRET,
+      environment: process.env.D_ENV
+    });
+    // this.client = new plaid.Client({
+    //   clientID: "600bc50bc2973c000f7d51ce",
+    //   secret: "f96cf7b6044909892ff311777a956b",
+    //   env: plaid.environments.sandbox,
+    //   options: {
+    //     version: "2018-05-22" // '2020-09-14' | '2019-05-29' | '2018-05-22' | '2017-03-08'
+    //   }
+    // });
+    // this.appToken = new Client({
+    //   key: "ZCulYxmi1gLMt0HAgAcdtDJ93XWpY1lyDst4Uyf7byODzBqIJN",
+    //   secret: "siXTIRpekGZcdN5MFwudMmtqP9iTPimOzxGUao9RnkhvKeGrjt",
+    //   environment: "sandbox" // defaults to 'production'
+    // });
   }
 
   async signUp(newUser) {
@@ -63,7 +84,6 @@ export default class UserModel extends BaseModel {
   }
   async checkVarificationStatus(email) {
     try {
-      console.log(email, "YOOOO");
       const user = await this.model.findOne({
         status: constants.VERIFIED,
         email: email
@@ -88,10 +108,25 @@ export default class UserModel extends BaseModel {
       { new: true }
     );
   }
+  async updateAccountDeatils(email, type, routing, accountNumber) {
+    return await this.model.findOneAndUpdate(
+      {
+        email: email,
+        status: constants.VERIFIED
+      },
+      {
+        $set: {
+          type: type,
+          routingNumber: routing,
+          accountNumber: accountNumber
+        }
+      },
+      { new: true }
+    );
+  }
   async getLinkToken(email) {
     try {
       const user = await this.checkVarificationStatus(email);
-      console.log(user);
       if (user) {
         return await generateLinkToken(this.client);
       } else {
@@ -101,36 +136,68 @@ export default class UserModel extends BaseModel {
       return error;
     }
   }
-
+  async updateDwollaInfomration(email, customerLink, fundLink, accountID) {
+    return await this.model.findOneAndUpdate(
+      {
+        email: email,
+        status: constants.VERIFIED
+      },
+      {
+        $set: {
+          customerLink: customerLink,
+          fundLink: fundLink,
+          dwollaAccountId: accountID
+        }
+      },
+      { new: true }
+    );
+  }
   // get account information
-  async accountInfomration(publicToken, metadata) {
-    console.log(metadata.accounts[1].id);
+  async accountInfomration(publicToken, metadata, email) {
     try {
       const getAccessToken = await generatePublicExchangeToken(
-        publicToken,
+        metadata.public_token,
         this.client
       );
-      const accountInfomration = await this.client
-        .getAccounts(getAccessToken.access_token)
+      const authInfomration = await this.client
+        .getAuth(getAccessToken.access_token, {})
         .catch(err => {
           console.log(err);
         });
-      // const processorTokenResponse = await this.client.createProcessorToken(
-      //   getAccessToken.access_token,
-      //   metadata.accounts[0].id,
-      //   "dwolla"
-      // );
-
-      // const payload = {
-      //   client_id: "600bc50bc2973c000f7d51ce",
-      //   secret: "f96cf7b6044909892ff311777a956b",
-      //   processor_token: processorTokenResponse
-      // };
-      // const authInfomration = await getAuthInfomration(
-      //   payload,
-      //   "https://api-sandbox.dwolla.com/customers"
-      // );
-      return accountInfomration;
+      if (
+        authInfomration.numbers.ach[0].routing &&
+        authInfomration.numbers.ach[0].account &&
+        authInfomration.accounts[0].subtype
+      ) {
+        await this.updateAccountDeatils(
+          email,
+          authInfomration.accounts[0].subtype,
+          authInfomration.numbers.ach[0].routing,
+          authInfomration.numbers.ach[0].account
+        );
+        const user = await this.getUserByEmail(email);
+        const resp = await this.appToken.get("/");
+        const dwollaAccountID = resp.body._links.account.href;
+        const dwollaUserCreation = await createCustomer(this.appToken, user);
+        const customerLocation = dwollaUserCreation.headers.get("location");
+        const dwollaFundCreation = await addFundAccount(
+          this.appToken,
+          authInfomration.numbers.ach[0].routing,
+          authInfomration.numbers.ach[0].account,
+          authInfomration.accounts[0].subtype,
+          `${user.firstName} ${user.lastName} is checking`,
+          customerLocation
+        );
+        const fundLocation = dwollaFundCreation.headers.get("location");
+        return await this.updateDwollaInfomration(
+          email,
+          customerLocation,
+          fundLocation,
+          dwollaAccountID
+        );
+      } else {
+        return { message: "Something wrong with get auth information !!" };
+      }
     } catch (error) {
       console.log(error);
       throw error;
@@ -164,6 +231,41 @@ export default class UserModel extends BaseModel {
       return user;
     } catch (error) {
       throw error;
+    }
+  }
+  async transferAmount(info) {
+    try {
+      var transferRequest = {
+        _links: {
+          source: {
+            href: info.senderFundLink
+          },
+          destination: {
+            href: info.receiverFundLink
+          }
+        },
+        amount: {
+          currency: info.currency,
+          value: info.amount
+        }
+      };
+      const respo = await this.appToken.post("transfers", transferRequest);
+      return respo.headers.get("location");
+      // .then(function(res) {
+      //   return respo.headers.get("location"); /
+      // });
+    } catch (error) {
+      return error;
+    }
+  }
+  async getBalance(email) {
+    try {
+      const user = await this.getUserByEmail(email);
+      var fundingLink = user.fundLink;
+      const resp = await this.appToken.get(`${fundingLink}/balance`);
+      return resp.balance.amount;
+    } catch (error) {
+      return error;
     }
   }
   async verifyOtp(email, verificationCode) {
