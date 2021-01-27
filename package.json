@@ -2,7 +2,7 @@
   "name": "backedn-test-api",
   "version": "1.0.0",
   "description": "backedn-test backend",
-  "author": "backedn-testDesignandTechPvtLtd",
+  "author": "Manish Kumar Jha",
   "license": "MIT",
   "scripts": {
     "dev-server": "rm -rf logs && mkdir logs && nodemon --exec \" cross-env nodemon --exec NODE_ENV=development babel-node --inspect src\"",
