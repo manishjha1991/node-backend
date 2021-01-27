@@ -31,16 +31,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/backedn-testDesignandTechPvtLtd/backedn-test-api.git"
+    "url": "https://github.com/manishjha1991/node-backend.git"
   },
   "keywords": [
     "backend",
     "boilerplate"
   ],
   "bugs": {
-    "url": "https://github.com/backedn-testDesignandTechPvtLtd/backedn-test-api/issues"
+    "url": "https://github.com/manishjha1991/node-backend/issues"
   },
-  "homepage": "https://github.com/backedn-testDesignandTechPvtLtd/backedn-test-api/blob/master/README.md",
+  "homepage": "https://github.com/manishjha1991/node-backend/README.md",
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-builtin-extend": "^1.1.2",

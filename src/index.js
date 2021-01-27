@@ -18,8 +18,8 @@ console.log(getEnv("NODE_ENV"));
 require("dotenv").config();
 const port = 8000;
 const sslOptions = {
-  key: fs.readFileSync("./ssl/nginx.key"),
-  cert: fs.readFileSync("./ssl/nginx.crt")
+  key: fs.readFileSync("./ssl/test.key"),
+  cert: fs.readFileSync("./ssl/test.crt")
 };
 http
   .createServer(app)

@@ -11,7 +11,7 @@ export const createRandomNumber = GROUP_ID_PREFIX => {
 export const sendSms = async (phoneNumber, verificationCode) => {
   try {
     const message = `${verificationCode} ${constants.OTP_MESSAGE}`;
-    const url = `http://api-alerts.solutionsinfini.com/v3/?method=sms&api_key=A31cf85c3cc3b65100bf9bd7fbe30cd90&to=+91${phoneNumber}&sender=SIDEMO&message=${message}`;
+    const url = "";
     await externalApiRequest(url, "GET");
   } catch (error) {
     throw error;

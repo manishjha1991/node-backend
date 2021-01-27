@@ -16,7 +16,6 @@ import {
   getAccountInformation as getAccountInformationRoutes,
   accountTransfer as accountTransferRoute,
   transactionList as transactionListRoutes
-
 } from "./routes/user";
 
 const logger = Logger.configure(configurationFile.loggerConfig);
@@ -54,14 +53,7 @@ export default function createRouter() {
   // * API ENDPOINTS *
   // *****************
 
-  /*
-   * sessions endpoints
-   */
-  // authenticate. Returns a json web token to use with requests.
-  /*
-   * users endpoints
-   */
-  // the sessions.verify middleware ensures the user is logged in
+  // users endpoints
 
   router.post("/signup", userSignUpRoutes);
   router.get("/signin", userSignInRoutes);
@@ -114,8 +106,6 @@ export default function createRouter() {
    */
   /*
    * function renderFrontendApp(req, res, next) {
-   *   // TODO: add code to render something here
-   * }
    * // all other pages route to the frontend application.
    * router.get('/*', renderFrontendApp);
    */
